@@ -4,8 +4,8 @@ import numpy as np
 import tensorflow as tf
 import pandas as pd
 
-H = 2048
-W = 1024
+H = 1024
+W = 2048
 
 def  data_process(x_path, y_path):
     images = []
@@ -42,7 +42,7 @@ def load_data(path):
 
     return (x_train, y_train), (x_valid, y_valid), (x_test, y_test)
 
-def read_images(x):
+def read_image(x):
     x = cv2.imread(x,cv2.IMREAD_COLOR)
     x = x / 255.0
     x = x.astype(np.float32)
@@ -56,12 +56,41 @@ def read_mask(x):
     x = x.astype(np.int32)
     return x
 
+def tf_dataset(x,y, batch = 8):
+    dataset = tf.data.Dataset.from_tensor_slices((x, y))
+    dataset = dataset.shuffle(buffer_size=5000)
+    dataset = dataset.map(preprocess)
+    dataset = dataset.batch(batch)
+    dataset = dataset.repeat()
+    dataset = dataset.prefetch(2)
+    return dataset
+
+def preprocess(x, y):
+    def f(x, y):
+        x = x.decode()
+        y = y.decode()
+
+        image = read_image(x)
+        mask = read_mask(y)
+
+        return image, mask
+
+    image, mask = tf.numpy_function(f, [x, y], [tf.float32, tf.int32])
+    mask = tf.one_hot(mask, 3, dtype=tf.int32)
+    image.set_shape([H, W, 3])
+    mask.set_shape([H, W, 3])
+
+    return image, mask
+
 if __name__ == '__main__':
     path = "E:\Dien_AI\Segment_Citydata\data"
     (x_train, y_train), (x_valid, y_valid), (x_test, y_test) = load_data(path)
     print(f"Dataset: Train: {len(x_train)} - Valid: {len(x_valid)} - Test: {len(x_test)}")
 
-    read_images(x_train[0])
+    read_image(x_train[0])
     read_mask(y_train[0])
+    dataset = tf_dataset(x_train, y_train, batch=8)
+    for x, y in dataset:
+        print(x.shape, y.shape)  ## (8, 256, 256, 3), (8, 256, 256, 3)
 
     print("End program")
