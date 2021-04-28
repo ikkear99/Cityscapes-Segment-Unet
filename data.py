@@ -4,8 +4,8 @@ import numpy as np
 import tensorflow as tf
 import pandas as pd
 
-H = 1024
-W = 2048
+H = 2048
+W = 1024
 
 def  data_process(x_path, y_path):
     images = []
@@ -14,7 +14,6 @@ def  data_process(x_path, y_path):
             for f in filenames:
                 names = os.path.join(dirpath, f"{f}")
                 images.append(names)
-    print(f"Images: {len(images)}")
 
     masks = []
     for i, (dirpath, dirnames, filenames) in enumerate(os.walk(y_path)):
@@ -24,7 +23,6 @@ def  data_process(x_path, y_path):
                 if f.count("_gtFine_labelIds") == 1 :
                     names = os.path.join(dirpath,f"{f}")
                     masks.append(names)
-    print(f"Masks: {len(masks)}")
 
     return images, masks
 
@@ -50,8 +48,6 @@ def read_image(x):
 
 def read_mask(x):
     x = cv2.imread(x, cv2.IMREAD_GRAYSCALE)
-    print(f"{type(x)}")
-    print(f"{x.shape}")
     x = x -1
     x = x.astype(np.int32)
     return x
