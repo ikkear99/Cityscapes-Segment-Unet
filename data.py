@@ -87,6 +87,6 @@ if __name__ == '__main__':
     read_mask(y_train[0])
     dataset = tf_dataset(x_train, y_train, batch=8)
     for x, y in dataset:
-        print(x.shape, y.shape)  ## (8, 256, 256, 3), (8, 256, 256, 3)
+        print(x.shape, y.shape)  ## (8, 2048, 1024, 3), (8, 2048, 1024, 3)
 
     print("End program")
