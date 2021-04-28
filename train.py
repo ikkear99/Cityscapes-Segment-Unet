@@ -4,6 +4,7 @@ import os
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
+from datetime import datetime
 
 if __name__ == '__main__':
     """ seeding """
@@ -28,8 +29,8 @@ if __name__ == '__main__':
     model.summary()
 
     """ data """
-    train_dataset = tf_dataset(x_train, y_train, batch=8)
-    valid_dataset = tf_dataset(x_valid, y_valid, batch=8)
+    train_dataset = tf_dataset(x_train, y_train, batch=bacth_size)
+    valid_dataset = tf_dataset(x_valid, y_valid, batch=bacth_size)
 
     train_steps = len(x_train)//bacth_size
     valid_steps = len(x_valid)//bacth_size
@@ -39,7 +40,7 @@ if __name__ == '__main__':
         ReduceLROnPlateau(monitor="val_loss",patience=1,factor=0.1, verbose=1,min_lr=1e-6),
         EarlyStopping(monitor="val_loss", patience=5,verbose=1)
     ]
-
+    start = datetime.now()
     model.fit( train_dataset,
               steps_per_epoch=train_steps,
               validation_steps=valid_steps,
@@ -47,3 +48,8 @@ if __name__ == '__main__':
               epochs=epochs,
               callbacks=callbacks
               )
+
+    duration = datetime.now() - start
+    print("Training completed in time: ", duration)
+
+    model = tf.keras.load_model("model.h5")

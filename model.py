@@ -1,6 +1,7 @@
 
 from tensorflow.keras.layers import Input, Conv2D, UpSampling2D, BatchNormalization, Activation, MaxPool2D, Concatenate
 from tensorflow.keras.models import Model
+import tensorflow as tf
 
 def conv_block(input, filter, pool = True):
     x = Conv2D(filter, kernel_size=3,  padding="same")(input)
